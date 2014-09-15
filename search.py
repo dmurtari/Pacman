@@ -69,6 +69,13 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s,s,w,s,w,w,s,w]
 
+def genericSearch(problem, queue_strat):
+    """
+    Generic search algorithm that takes a problem and a queuing strategy
+    and performs a search given that strategy
+    """
+    util.raiseNotDefined()
+    
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first
@@ -84,7 +91,7 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    genericSearch(problem, util.Stack())
 
 def breadthFirstSearch(problem):
     """
