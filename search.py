@@ -138,7 +138,7 @@ def depthFirstSearch(problem):
        not the best solution.
     """
 
-    # Use the genericSearch method, with the fringe maintainged using a Stack
+    # Use the genericSearch method, with the fringe maintained using a Stack
     # so that the search proceeds in the order of exploring from the node last
     # discovered
     return genericSearch(problem, util.Stack())
@@ -148,7 +148,13 @@ def breadthFirstSearch(problem):
     Search the shallowest nodes in the search tree first.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    # Use the genericSearch method, with the fringe maintained with a Queue so 
+    # that all nodes on the same level are explored before the next level is 
+    # explored. This will find the optimal solution, because each level is 
+    # explored before the next, so the first time the goal is reached will be
+    # the shortest path to the goal.
+    return genericSearch(problem, util.Queue())
 
 def uniformCostSearch(problem):
     "Search the node of least total cost first. "
