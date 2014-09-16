@@ -69,7 +69,7 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s,s,w,s,w,w,s,w]
 
-def genericSearch(problem, fringe):
+def genericSearch(problem, fringe, heuristic=None):
     """
     Generic search algorithm that takes a problem and a queuing strategy
     and performs a search given that strategy
@@ -78,13 +78,16 @@ def genericSearch(problem, fringe):
     visited = []        # List of already visisted nodes
     action_list = []    # List of actions taken to get to the current node
     total_cost = 0      # Cost to get to the current node
+    initial = problem.getStartState()   # Starting state of the problem
 
     # Push a tuple of the start state, blank action list, and zero cost onto the
     # appropriate fringe data structure
     if isinstance(fringe, util.Stack) or isinstance(fringe, util.Queue):
-        fringe.push((problem.getStartState(), action_list))
+        fringe.push((initial, action_list))
+    elif isinstance(fringe, util.PriorityQueue) and heuristic != None:
+        fringe.push((initial, action_list), heuristic(initial, problem))
     elif isinstance(fringe, util.PriorityQueue):
-        fringe.push((problem.getStartState(), action_list, total_cost), total_cost)
+        fringe.push((initial, action_list, total_cost), total_cost)
 
 
     # While there are still elements on the fringe, expand the value of each 
@@ -96,8 +99,10 @@ def genericSearch(problem, fringe):
     # The cost is only used when the fringe data structure is a PriorityQueue,
     # such as when the search algorithm in use is UCS.
     while not fringe.isEmpty(): 
-        if isinstance(fringe, util.Stack) or isinstance(fringe, util.Queue):
+        if isinstance(fringe, util.Stack):
             node, actions = fringe.pop() 
+        elif isinstance(fringe, util.PriorityQueue) and heuristic != None:
+            node, actions = fringe.pop()
         elif isinstance(fringe, util.PriorityQueue):
             node, actions, total_cost = fringe.pop() 
 
@@ -113,10 +118,15 @@ def genericSearch(problem, fringe):
                 coordinate, direction, cost = successor
                 if isinstance(fringe, util.Stack) or isinstance(fringe, util.Queue):
                     fringe.push((coordinate, actions + [direction]))
+                elif isinstance(fringe, util.PriorityQueue) and heuristic != None:
+                    new_actions = actions + [direction]
+                    new_cost = problem.getCostOfActions(new_actions) + \
+                               heuristic(coordinate, problem)
+                    fringe.push((coordinate, new_actions), new_cost)
                 elif isinstance(fringe, util.PriorityQueue):
                     new_cost = cost + total_cost
-                    fringe.push((coordinate, actions + [direction], new_cost), new_cost)
-                    
+                    fringe.push((coordinate, actions + \
+                                 [direction], new_cost), new_cost)                   
 
     return []
     
@@ -189,7 +199,7 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     "Search the node that has the lowest combined cost and heuristic first."
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return genericSearch(problem, util.PriorityQueue(), heuristic)
 
 
 # Abbreviations
