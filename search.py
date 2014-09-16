@@ -80,16 +80,26 @@ def genericSearch(problem, fringe):
     total_cost = 0      # Cost to get to the current node
 
     # Push a tuple of the start state, blank action list, and zero cost onto the
-    # appropriate fringe algorithm
-    fringe.push((problem.getStartState(), action_list, total_cost))
+    # appropriate fringe data structure
+    if isinstance(fringe, util.Stack) or isinstance(fringe, util.Queue):
+        fringe.push((problem.getStartState(), action_list))
+    elif isinstance(fringe, util.PriorityQueue):
+        fringe.push((problem.getStartState(), action_list, total_cost), total_cost)
+
 
     # While there are still elements on the fringe, expand the value of each 
-    # node for the node to explore, actions to get there, and the cost. If th
+    # node for the node to explore, actions to get there, and the cost. If the
     # node isn't visited already, check to see if node is the goal. If no, then
     # add all of the node's successors onto the fringe (with relevant 
     # information about path and cost associated with that node)
-    while not fringe.isEmpty():
-        node, actions, cost = fringe.pop() 
+
+    # The cost is only used when the fringe data structure is a PriorityQueue,
+    # such as when the search algorithm in use is UCS.
+    while not fringe.isEmpty(): 
+        if isinstance(fringe, util.Stack) or isinstance(fringe, util.Queue):
+            node, actions = fringe.pop() 
+        elif isinstance(fringe, util.PriorityQueue):
+            node, actions, total_cost = fringe.pop() 
 
         if not node in visited:
             visited.append(node)
@@ -101,7 +111,11 @@ def genericSearch(problem, fringe):
 
             for successor in successors:
                 coordinate, direction, cost = successor
-                fringe.push((coordinate, actions + [direction], cost + total_cost))
+                if isinstance(fringe, util.Stack) or isinstance(fringe, util.Queue):
+                    fringe.push((coordinate, actions + [direction]))
+                elif isinstance(fringe, util.PriorityQueue):
+                    new_cost = cost + total_cost
+                    fringe.push((coordinate, actions + [direction], new_cost), new_cost)
                     
 
     return []
@@ -159,7 +173,11 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     "Search the node of least total cost first. "
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    # Use the genericSearch method, with the fringe maintained with a 
+    # PriorityQueue. The PriorityQueue will utilize the costs of the edges in
+    # order to determine the order that the nodes should be visited.
+    return genericSearch(problem, util.PriorityQueue())
 
 def nullHeuristic(state, problem=None):
     """
