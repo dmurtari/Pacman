@@ -69,12 +69,36 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s,s,w,s,w,w,s,w]
 
-def genericSearch(problem, queue_strat):
+def genericSearch(problem, fringe):
     """
     Generic search algorithm that takes a problem and a queuing strategy
     and performs a search given that strategy
     """
-    util.raiseNotDefined()
+
+    visited = []
+    action_list = []
+    total_cost = 0
+
+    fringe.push((problem.getStartState(), action_list, total_cost))
+
+    while not fringe.isEmpty():
+        node, actions, cost = fringe.pop()
+        print "Actions to ", node, "are", actions
+    
+        if not node in visited:
+            visited.append(node)
+            successors = problem.getSuccessors(node)
+
+            if problem.isGoalState(node):
+                print "Actions are", actions
+                return actions
+
+            for successor in successors:
+                coordinate, direction, cost = successor
+                fringe.push((coordinate, actions + [direction], cost + total_cost))
+                    
+
+    return []
     
 def depthFirstSearch(problem):
     """
@@ -91,7 +115,8 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    genericSearch(problem, util.Stack())
+
+    return genericSearch(problem, util.Stack())
 
 def breadthFirstSearch(problem):
     """
