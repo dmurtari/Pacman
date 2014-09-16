@@ -75,23 +75,29 @@ def genericSearch(problem, fringe):
     and performs a search given that strategy
     """
 
-    visited = []
-    action_list = []
-    total_cost = 0
+    visited = []        # List of already visisted nodes
+    action_list = []    # List of actions taken to get to the current node
+    total_cost = 0      # Cost to get to the current node
 
+    # Push a tuple of the start state, blank action list, and zero cost onto the
+    # appropriate fringe algorithm
     fringe.push((problem.getStartState(), action_list, total_cost))
 
+    # While there are still elements on the fringe, expand the value of each 
+    # node for the node to explore, actions to get there, and the cost. If th
+    # node isn't visited already, check to see if node is the goal. If no, then
+    # add all of the node's successors onto the fringe (with relevant 
+    # information about path and cost associated with that node)
     while not fringe.isEmpty():
-        node, actions, cost = fringe.pop()
-        print "Actions to ", node, "are", actions
-    
+        node, actions, cost = fringe.pop() 
+
         if not node in visited:
             visited.append(node)
-            successors = problem.getSuccessors(node)
 
             if problem.isGoalState(node):
-                print "Actions are", actions
                 return actions
+
+            successors = problem.getSuccessors(node)
 
             for successor in successors:
                 coordinate, direction, cost = successor
@@ -116,6 +122,25 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
 
+    """ 
+    Written Answers for Question 1
+
+    1. The exploration order is what I would have expected. The search goes as
+       deep as it can, before exploring other paths (as would be expected with 
+       depth first search).
+    2. No, Pacman does not go to all of the explored squares on the way to the 
+       goal. He follows a path that does not lead him to any dead-ends, even if
+       dead ends were explored. In my implementation, the length for a 
+       MediumMaze was 130.
+    3. This is not the least-cost solution -- there is clearly a cheaper 
+       solution that Pacman does not take on the MediumMaze. This is because
+       DFS will return the first solution that it finds that solves the problem,
+       not the best solution.
+    """
+
+    # Use the genericSearch method, with the fringe maintainged using a Stack
+    # so that the search proceeds in the order of exploring from the node last
+    # discovered
     return genericSearch(problem, util.Stack())
 
 def breadthFirstSearch(problem):
