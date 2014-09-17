@@ -284,12 +284,22 @@ class CornersProblem(search.SearchProblem):
     def getStartState(self):
         "Returns the start state (in your state space, not the full Pacman state space)"
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        
+        # Store visited corners as an array, and give the state as a tuple of
+        # the current state and the visited corners
+        visitedCorners = (False, False, False, False)
+        return (self.startingPosition, visitedCorners)
 
     def isGoalState(self, state):
         "Returns whether this search state is a goal state of the problem"
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        
+        # Corners are all visited if all elements in the visited corners array 
+        # are true
+        visitedCorners = state[1]
+        return visitedCorners[0] and visitedCorners[1] and visitedCorners[2] \
+               and visitedCorners[3]
+
 
     def getSuccessors(self, state):
         """
@@ -304,15 +314,35 @@ class CornersProblem(search.SearchProblem):
         """
 
         successors = []
-        for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
-            # Add a successor state to the successor list if the action is legal
-            # Here's a code snippet for figuring out whether a new position hits a wall:
-            #   x,y = currentPosition
-            #   dx, dy = Actions.directionToVector(action)
-            #   nextx, nexty = int(x + dx), int(y + dy)
-            #   hitsWall = self.walls[nextx][nexty]
+        currentPosition = state[0]
+        corners = state[1]
+        bottom, left, top, right = 1, 1, self.walls.height-2, self.walls.width-2
 
-            "*** YOUR CODE HERE ***"
+        # For every direction from the current position, check to see if moving
+        # will hit a wall. If it doesn't, see if making the move would lead to 
+        # a corner. If so, give that move as a possible successor, and update
+        # the visited corners to reflect that the corner is visited (if that
+        # move is mode). Otherwise, just update the position without changing
+        # the visited corners. 
+        for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+            x,y = currentPosition
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+
+            if not hitsWall:
+                if (nextx, nexty) in self.corners:
+                    if (nextx, nexty) == (left, bottom):
+                        visited = True, corners[1], corners[2], corners[3]
+                    elif (nextx, nexty) == (left, top):
+                        visited = corners[0], True, corners[2], corners[3]
+                    elif (nextx, nexty) == (right, top):
+                        visited = corners[0], corners[1], True, corners[3]
+                    elif (nextx, nexty) == (right, bottom):
+                        visited = corners[0], corners[1], corners[2], True
+                    successors.append((((nextx, nexty), visited), action, 1))
+                else:
+                    successors.append((((nextx, nexty), corners), action, 1))
 
         self._expanded += 1
         return successors
