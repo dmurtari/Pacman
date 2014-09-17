@@ -277,13 +277,11 @@ class CornersProblem(search.SearchProblem):
             if not startingGameState.hasFood(*corner):
                 print 'Warning: no food in corner ' + str(corner)
         self._expanded = 0 # Number of search nodes expanded
-        # Please add any code here which you would like to use
-        # in initializing the problem
 
     def getStartState(self):
         "Returns the start state (in your state space, not the full Pacman state space)"
         
-        # Store visited corners as an array, and give the state as a tuple of
+        # Store visited corners in an array, and give the state as a tuple of
         # the current state and the visited corners
         visited = []
         return (self.startingPosition, visited)
@@ -291,7 +289,7 @@ class CornersProblem(search.SearchProblem):
     def isGoalState(self, state):
         "Returns whether this search state is a goal state of the problem"
         
-        # Corners are all visited if there are 4 elements in the corners array
+        # Corners are all visited if there are 4 elements in the corners array.
         return len(state[1]) == 4
 
     def getSuccessors(self, state):
@@ -366,7 +364,7 @@ def cornersHeuristic(state, problem):
     unvisited = []        # Hold unvisited corners
     visited = state[1]    # Visited corners
     node = state[0]       # Current node
-    sum = 0               # Heuristic value
+    heuristic = 0         # Heuristic value
 
     # Find all the corners that we haven't visited yet, and append them to a 
     # list so we can go through them
@@ -374,15 +372,21 @@ def cornersHeuristic(state, problem):
         if not corner in visited:
             unvisited.append(corner)
     
-    # While unvisited still has corners in it, find the corner that is the 
-    # shortest distance away.  
+    # Find the sum of the shortest distances between the unvisited corners. Use 
+    # this as the heuristic because it is consistent (will always choose the
+    # same corners for a given situation). It solves the simpler problem where
+    # we find the number of moves when all of the walls have been removed. The
+    # heuristic will return 0 at a goal state since the minimum distance to a 
+    # corner when in a corner is 0, and will never return a negative since 
+    # mangattanDistance can never be negative. 
     while unvisited:
-        distance, corner = min([(util.manhattanDistance(node, corner), corner) for corner in unvisited])
-        sum += distance
+        distance, corner = min([(util.manhattanDistance(node, corner), corner) \
+                                for corner in unvisited])
+        heuristic += distance
         node = corner
         unvisited.remove(corner)
     
-    return sum
+    return heuristic
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -472,17 +476,22 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-
     heuristic = 0
     food = foodGrid.asList()
     
+    # If there isn't any food, then there isn't a problem to solve
     if len(food) == 0:
         return 0
 
     # Take advantage of the given maze-distance function to determine the 
     # heuristic. Takes an incredibly long time (~40s!), but expands only
-    # 4137 nodes    
+    # 4137 nodes. This heuristic is consistent, because the maze distance
+    # will always find the same distance to a given piece of food. This solves
+    # the simpler problem of finding the distance to the farthest piece of food.
+    # Heursitic will also return 0 at a goal (since if pacman has eaten all of 
+    # the food then the distance to the nearest food will be the one pacman is
+    # currently on), and will never return a negative (since distances can't be
+    # negative)
     for food in food:
         distance = mazeDistance(position, food, problem.startingGameState)
         if distance > heuristic:
@@ -514,8 +523,6 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
-        "*** YOUR CODE HERE ***"
-
         """
         Does not always find the shortest path through the maze, because the
         closest food might not be on the path of the shortest path through them
@@ -525,6 +532,7 @@ class ClosestDotSearchAgent(SearchAgent):
         else before finally returning to eat that food.
         """
 
+        # Perform a BFS to find the closest dot.
         fringe = util.Queue()
         visited = []        # List of already visited nodes
         action_list = []    # List of actions taken to get to the current node
@@ -535,14 +543,11 @@ class ClosestDotSearchAgent(SearchAgent):
 
         while fringe: 
             node, actions = fringe.pop() 
-
             if not node in visited:
                 visited.append(node)
                 if problem.isGoalState(node):
                     return actions
-
                 successors = problem.getSuccessors(node)
-
                 for successor in successors:
                     coordinate, direction, cost = successor
                     fringe.push((coordinate, actions + [direction]))
@@ -580,9 +585,10 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         that will complete the problem definition.
         """
         x,y = state
-
-        "*** YOUR CODE HERE ***"
         foodPositions = self.food.asList()
+
+        # The goal is if pacman's current position is a location where there is
+        # a piece of food. 
         return (x, y) in foodPositions
 
 ##################
