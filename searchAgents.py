@@ -279,11 +279,9 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0 # Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
-        "*** YOUR CODE HERE ***"
 
     def getStartState(self):
         "Returns the start state (in your state space, not the full Pacman state space)"
-        "*** YOUR CODE HERE ***"
         
         # Store visited corners as an array, and give the state as a tuple of
         # the current state and the visited corners
@@ -292,11 +290,8 @@ class CornersProblem(search.SearchProblem):
 
     def isGoalState(self, state):
         "Returns whether this search state is a goal state of the problem"
-        "*** YOUR CODE HERE ***"
         
         # Corners are all visited if there are 4 elements in the corners array
-        if len(state[1]) == 4:
-            print "done", state[1]
         return len(state[1]) == 4
 
     def getSuccessors(self, state):
@@ -372,34 +367,16 @@ def cornersHeuristic(state, problem):
     visited = state[1]    # Visited corners
     node = state[0]       # Current node
     sum = 0               # Heuristic value
-    print corners
-    
-    # Since visited corners are stored as a (Bool, Bool, Bool Bool) tuple, in 
-    # order to be able to 
-    """
-    visitedCorners = []
-    for i, visit in enumerate(visited):
-        if visit:
-            visitedCorners.append(corners[i])
 
     for corner in corners:
-        if not corner in visitedCorners:
-            print corner, "is not in", visitedCorners
+        if not corner in visited:
             unvisited.append(corner)
-    """
-
-    for corner in len(corners):
-        if not visited[corner]:
-            print corner, "is not in", visitedCorners
-            unvisited.append(corner)    
-    currentPoint = node
-    
-    while len(unvisited) > 0:
-        distance, corner = min([(util.manhattanDistance(currentPoint, corner), corner) for corner in unvisited])
+     
+    while unvisited:
+        distance, corner = min([(util.manhattanDistance(node, corner), corner) for corner in unvisited])
         sum += distance
-        currentPoint = corner
+        node = corner
         unvisited.remove(corner)
-    print "Heuristic: ", sum
     
     return sum
 
