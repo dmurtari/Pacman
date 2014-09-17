@@ -121,7 +121,7 @@ def genericSearch(problem, fringe, heuristic=None):
 
     # The cost is only used when the fringe data structure is a PriorityQueue,
     # such as when the search algorithm in use is UCS.
-    while not fringe.isEmpty(): 
+    while fringe: 
         if isinstance(fringe, util.Stack) or isinstance(fringe, util.Queue):
             node, actions = fringe.pop() 
         elif isinstance(fringe, util.PriorityQueue) and heuristic != None:
