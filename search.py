@@ -73,6 +73,29 @@ def genericSearch(problem, fringe, heuristic=None):
     """
     Generic search algorithm that takes a problem and a queuing strategy
     and performs a search given that strategy
+
+    Written Answers for Question 1
+
+    1. The exploration order is what I would have expected. The search goes as
+       deep as it can, before exploring other paths (as would be expected with 
+       depth first search).
+    2. No, Pacman does not go to all of the explored squares on the way to the 
+       goal. He follows a path that does not lead him to any dead-ends, even if
+       dead ends were explored. In my implementation, the length for a 
+       MediumMaze was 130.
+    3. This is not the least-cost solution -- there is clearly a cheaper 
+       solution that Pacman does not take on the MediumMaze. This is because
+       DFS will return the first solution that it finds that solves the problem,
+       not the best solution.
+
+    Written Answers for Question 4
+
+    1. With OpenMaze, BFS, UCS, and A* all find the shortest path to the goal, 
+       with BFS and UCS expanding the same number of search nodes (682) and A*
+       expanding the least amount of nodes (535). All paths have a cost of 54.
+       DFS does find the solution as well, but is not the shortest -- the cost
+       of the path found with DFS was 298. This is because DFS does not look 
+       for the shortest path.
     """
 
     visited = []        # List of already visisted nodes
@@ -145,22 +168,6 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-
-    """ 
-    Written Answers for Question 1
-
-    1. The exploration order is what I would have expected. The search goes as
-       deep as it can, before exploring other paths (as would be expected with 
-       depth first search).
-    2. No, Pacman does not go to all of the explored squares on the way to the 
-       goal. He follows a path that does not lead him to any dead-ends, even if
-       dead ends were explored. In my implementation, the length for a 
-       MediumMaze was 130.
-    3. This is not the least-cost solution -- there is clearly a cheaper 
-       solution that Pacman does not take on the MediumMaze. This is because
-       DFS will return the first solution that it finds that solves the problem,
-       not the best solution.
-    """
 
     # Use the genericSearch method, with the fringe maintained using a Stack
     # so that the search proceeds in the order of exploring from the node last
