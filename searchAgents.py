@@ -473,7 +473,7 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -501,7 +501,29 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        fringe = util.Queue()
+        visited = []        # List of already visited nodes
+        action_list = []    # List of actions taken to get to the current node
+        total_cost = 0      # Cost to get to the current node
+        initial = problem.getStartState()   # Starting state of the problem
+
+        fringe.push((initial, action_list))
+
+        while fringe: 
+            node, actions = fringe.pop() 
+
+            if not node in visited:
+                visited.append(node)
+                if problem.isGoalState(node):
+                    return actions
+
+                successors = problem.getSuccessors(node)
+
+                for successor in successors:
+                    coordinate, direction, cost = successor
+                    fringe.push((coordinate, actions + [direction]))
+ 
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -537,7 +559,8 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        foodPositions = self.food.asList()
+        return (x, y) in foodPositions
 
 ##################
 # Mini-contest 1 #
