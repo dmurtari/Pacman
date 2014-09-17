@@ -502,6 +502,15 @@ class ClosestDotSearchAgent(SearchAgent):
 
         "*** YOUR CODE HERE ***"
 
+        """
+        Does not always find the shortest path through the maze, because the
+        closest food might not be on the path of the shortest path through them
+        maze. For example, if there are two dots to choose from, the algorithm
+        may pick one arbitratily, which could leave the other food as the only
+        food left in that area of the maze. Then, Pacman will eat everything 
+        else before finally returning to eat that food.
+        """
+        
         fringe = util.Queue()
         visited = []        # List of already visited nodes
         action_list = []    # List of actions taken to get to the current node
