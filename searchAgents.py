@@ -287,19 +287,17 @@ class CornersProblem(search.SearchProblem):
         
         # Store visited corners as an array, and give the state as a tuple of
         # the current state and the visited corners
-        visitedCorners = (False, False, False, False)
-        return (self.startingPosition, visitedCorners)
+        visited = []
+        return (self.startingPosition, visited)
 
     def isGoalState(self, state):
         "Returns whether this search state is a goal state of the problem"
         "*** YOUR CODE HERE ***"
         
-        # Corners are all visited if all elements in the visited corners array 
-        # are true
-        visitedCorners = state[1]
-        return visitedCorners[0] and visitedCorners[1] and visitedCorners[2] \
-               and visitedCorners[3]
-
+        # Corners are all visited if there are 4 elements in the corners array
+        if len(state[1]) == 4:
+            print "done", state[1]
+        return len(state[1]) == 4
 
     def getSuccessors(self, state):
         """
@@ -315,7 +313,7 @@ class CornersProblem(search.SearchProblem):
 
         successors = []
         currentPosition = state[0]
-        corners = state[1]
+        foundCorners = state[1]
         bottom, left, top, right = 1, 1, self.walls.height-2, self.walls.width-2
 
         # For every direction from the current position, check to see if moving
@@ -331,18 +329,11 @@ class CornersProblem(search.SearchProblem):
             hitsWall = self.walls[nextx][nexty]
 
             if not hitsWall:
-                if (nextx, nexty) in self.corners:
-                    if (nextx, nexty) == (left, bottom):
-                        visited = True, corners[1], corners[2], corners[3]
-                    elif (nextx, nexty) == (left, top):
-                        visited = corners[0], True, corners[2], corners[3]
-                    elif (nextx, nexty) == (right, top):
-                        visited = corners[0], corners[1], True, corners[3]
-                    elif (nextx, nexty) == (right, bottom):
-                        visited = corners[0], corners[1], corners[2], True
+                if (nextx, nexty) in self.corners and (nextx, nexty) not in foundCorners:
+                    visited = foundCorners + [(nextx, nexty)]
                     successors.append((((nextx, nexty), visited), action, 1))
                 else:
-                    successors.append((((nextx, nexty), corners), action, 1))
+                    successors.append((((nextx, nexty), foundCorners), action, 1))
 
         self._expanded += 1
         return successors
@@ -374,11 +365,43 @@ def cornersHeuristic(state, problem):
     on the shortest path from the state to a goal of the problem; i.e.
     it should be admissible (as well as consistent).
     """
+    
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+    unvisited = []        # Hold unvisited corners
+    visited = state[1]    # Visited corners
+    node = state[0]       # Current node
+    sum = 0               # Heuristic value
+    print corners
+    
+    # Since visited corners are stored as a (Bool, Bool, Bool Bool) tuple, in 
+    # order to be able to 
+    """
+    visitedCorners = []
+    for i, visit in enumerate(visited):
+        if visit:
+            visitedCorners.append(corners[i])
 
-    "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    for corner in corners:
+        if not corner in visitedCorners:
+            print corner, "is not in", visitedCorners
+            unvisited.append(corner)
+    """
+
+    for corner in len(corners):
+        if not visited[corner]:
+            print corner, "is not in", visitedCorners
+            unvisited.append(corner)    
+    currentPoint = node
+    
+    while len(unvisited) > 0:
+        distance, corner = min([(util.manhattanDistance(currentPoint, corner), corner) for corner in unvisited])
+        sum += distance
+        currentPoint = corner
+        unvisited.remove(corner)
+    print "Heuristic: ", sum
+    
+    return sum
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
