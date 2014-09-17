@@ -474,6 +474,20 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
 
+    heuristic = 0
+    food = foodGrid.asList()
+    
+    if len(food) == 0:
+        return 0
+
+    # Take advantage of the given maze-distance function to determine the 
+    # heuristic. Takes an incredibly long time (~40s!), but expands only
+    # 4137 nodes    
+    for food in food:
+        distance = mazeDistance(position, food, problem.startingGameState)
+        if distance > heuristic:
+            heuristic = distance
+    return heuristic
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -510,7 +524,7 @@ class ClosestDotSearchAgent(SearchAgent):
         food left in that area of the maze. Then, Pacman will eat everything 
         else before finally returning to eat that food.
         """
-        
+
         fringe = util.Queue()
         visited = []        # List of already visited nodes
         action_list = []    # List of actions taken to get to the current node
